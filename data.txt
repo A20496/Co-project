@@ -1,21 +1,25 @@
 var xyz
 var X
-var P
-
-
-add R1 FLAGS
+var p
+add R1 xyyy
 sub FLAGS R2
-
+mov yuthvh R2   
+mov R2 FLAGS
+mov FLAGS vhjh
+div R1 R5
+div 6yu hj 
+mov R1 
 cmp R2 R3
 jmp label1
-je 1010011
+ld yvhv p
+je 1010011 
 ld R1 1100001
-mov R1 $12
-je label2
-
+add R1 $12 
+var gfkah
 mul R1 R2 R3
-st R3 X
-mov R2 $10
-mov R3 $12
+st R3 X  
+var pugfytf
+label1: add R1 R2 R5  
+        mov R2 $10
+        mov R3 $12 
 sub R2 R3
-hlt
