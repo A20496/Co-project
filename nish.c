@@ -9,23 +9,28 @@ struct store{
     int imm ; char addr[20] ; char label[20] ;
 };
 
-int check_errors(int instructions, struct store* all,char* all_opcodes[]){
-    //d&i stack
-    int flg1=0;
-    int i=0;
+char* insertZeroes(const char* str, int i, int n) {
+    int len = strlen(str);
+    int newLen = len + n;
+    char* newStr = (char*)malloc((newLen + 1) * sizeof(char));
+    int j, k;
 
-    for (i=0;i<instructions;i++){
-        for(int j=0;j<20;j++){
-            if ((strcmp(all[i].opc,"var")!=0) && (strcmp(all[i].opc,all_opcodes[j])==0) ){
-                flg1=1;
-            }
-            if (flg1==1 && ((strcmp(all[i].opc,"var")==0))){
-                printf("Error: Variables not declared in the beginning");
-                break;
-            }
+    if (i < 0 || i > len) {
+        printf("Invalid position.\n");
+        return NULL;
+    }
+
+    for (j = 0, k = 0; j < newLen; j++) {
+        if (j >= i && j < i + n) {
+            newStr[j] = '0';
+        } else {
+            newStr[j] = str[k];
+            k++;
         }
     }
-    return 0;
+
+    newStr[newLen] = '\0';
+    return newStr;
 }
 
 char* num_to_binary(int number, int bits) {         //converts given number to binary of n bits
@@ -79,6 +84,30 @@ int search(int n,int m,char str[],char arr[n][m]){
 }
 
 int main() {
+
+    //opening files here
+
+    FILE* answers_file;
+    char fname3[] = "answers.txt";
+
+    answers_file = fopen(fname3, "w");
+
+
+    if (answers_file == NULL) {
+        printf("Failed to open the error file");
+    }
+
+    FILE* errors_file;
+    char fname[] = "errors.txt";
+
+    errors_file = fopen(fname, "w");
+
+
+    if (errors_file == NULL) {
+        printf("Failed to open the error file");
+    }
+
+
     int p = 0;
     char filename[] = "data.txt";
     char line[100];
@@ -90,6 +119,8 @@ int main() {
         printf("Error opening file %s\n", filename);
         return 1;
     }
+
+    //finished opening files
 
     int i=0;
     int instructions=0;
@@ -213,21 +244,193 @@ int main() {
     //     printf("\n");
     // }
 
+
+    
+    //checking for errors here
+
+    char opinstructions[25][10] = {"add", "sub", "mov", "mov", "ld", "st", "mul", "div", "rs", "ls", "xor", "or", "and", "not", "cmp", "jmp", "jlt", "jgt", "je", "hlt"};
+
+    int flag_v = 0;
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc,"var")!=0) {
+            flag_v = 1;
+        }
+        if (flag_v == 1) {
+            if (strcmp(all[i].opc, "var")==0) {
+            char str__[30];
+            char num1[10];
+            sprintf(num1, "%d", instructions+1);
+            strcat(str__, "line ");
+            strcat(str__, num1);
+            strcat(str__, " : var defined at wrong place");
+                fprintf(errors_file, "%s", str__);
+                exit(1);
+            }
+        }
+    }
+
+    int flag_op = 0;
+
+    for (int i=0;i<instructions;i++) {
+            if (strcmp(all[i].opc, "var")!=0) {
+                for (int j=0; j<20; j++) {
+                    if (strcmp(all[i].opc, opinstructions[j])==0) {
+                        flag_op = 1;
+                    }
+                }
+            }
+
+            else {
+                flag_op = 1;
+            }
+
+        if (flag_op == 0) {
+            char str2[30];
+            char num2[10];
+            sprintf(num2, "%d", instructions+1);
+            strcat(str2, "line ");
+            strcat(str2, num2);
+            strcat(str2, " : typo in opcode");
+
+           fprintf(errors_file, "%s", str2); 
+           exit(1);
+        }
+
+        flag_op = 0;
+
+    }
+
+    int flag_varb = 0;
+
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc, "ld")==0 || strcmp(all[i].opc, "st")==0) {
+
+            if (strcmp(all[i].addr, "NULL")!=0) {
+
+            for (int j=0; j<var_counter; j++) {
+                if (strcmp(all[i].addr, var_arr[j])==0) flag_varb = 1;
+            }
+        }
+
+            else {
+                flag_varb = 1;
+            }
+    
+        if (flag_varb==0) {
+
+            char str3[30];
+            char num3[10];
+            sprintf(num3, "%d", instructions+1);
+            strcat(str3, "line ");
+            strcat(str3, num3);
+            strcat(str3, " : memory address in load and store is not a variable");
+
+
+            fprintf(errors_file, "%s", str3); 
+            exit(1);
+        }
+
+        flag_varb = 0;
+    }
+
+}
+
+    int label_count = l; //no. of labels //important
+
+    for(int t=0;t<instructions;t++) {
+        if (all[t].imm!=-1) {
+        if (all[t].imm > 127 || all[t].imm < 0) {
+
+            char str4[30];
+            char num4[10];
+            sprintf(num4, "%d", instructions+1);
+            strcat(str4, "line ");
+            strcat(str4, num4);
+            strcat(str4, " : Value not in the inclusive range of 0 to 127");
+
+            fprintf(errors_file, "%s", str4); 
+            exit(1);
+            }
+        }
+    }
+
+    int flag_halt = 0;
+
+    for(int i=0;i<instructions;i++) {
+
+    if (strcmp(all[i].opc,"hlt")==0) {
+        flag_halt = 1;
+        if(strcmp(all[instructions-1].opc, "hlt")!=0) {
+
+            char str5[30];
+            char num5[10];
+            sprintf(num5, "%d", instructions+1);
+            strcat(str5, "line ");
+            strcat(str5, num5);
+            strcat(str5, " : hlt not at the end");
+
+            fprintf(errors_file, "%s", str5); 
+            exit(1);
+            }
+    }
+}
+
+if (flag_halt==0) {
+        fprintf(errors_file, "%s", "halt is not present"); 
+        exit(1);
+    }
+
+
+    int flag_lab = 0;
+
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc, "jmp")==0 || strcmp(all[i].opc, "jlt")==0 || strcmp(all[i].opc, "jgt")==0 || strcmp(all[i].opc, "je")==0) {
+
+            if (strcmp(all[i].label, "NULL")!=0) {
+
+            for (int j=0; j<l; j++) {
+                if (strcmp(all[i].label, valid_label[j])==0) flag_lab = 1;
+            }
+        }
+
+            else {
+                flag_lab = 1;
+            }
+    
+        if (flag_lab==0) {
+            char str_[30];
+            char num[10];
+            sprintf(num, "%d", instructions+1);
+            strcat(str_, "line ");
+            strcat(str_, num);
+            strcat(str_, " : label used in jump instructions is not defined");
+            fprintf(errors_file, "%s", str_); 
+            exit(1);
+        }
+
+        flag_lab = 0;
+    }
+}
+
+
+fclose(errors_file);
+
    //kindly check for errors before this point and stop execution if any are found
 
 
-   int label_count = l; //no. of labels
    char* label_addresses[label_count];
    for (int i=0; i<l;i++) {
         label_addresses[i] = num_to_binary(label_line[i], 7);
    }
 
-   char opinstructions[25][10] = {"add", "sub", "mov", "mov", "ld", "st", "mul", "div", "rs", "ls", "xor", "or", "and", "not", "cmp", "jmp", "jlt", "jgt", "je", "hlt"};
 
-   char *answers[128];
-   int answer_count;
-   int address_count[128];
+    char *answers[128];
+    int answer_count;
+    int address_count[128];
     int flag;
+
+    
+
     for (int i=0;i<instructions;i++) {
         char opcodes[25][10] = {"00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", "11100", "11101", "11111", "11010"};
         char *answer;
@@ -271,32 +474,17 @@ int main() {
                     strcat(answer, "00000000000");
                 }
 
-                // int unused = 16 - strlen(answer);
-                // char* zeroes;
-                // char* initial; 
-                // char* final;
-                // int v = 0;
-                // for (int r=0; r<unused; r++) {
-                //     zeroes[r] = '0';
-                // }
-                // for (int r=0; r<5; r++) {
-                //     initial[r] = answer[r];
-                // }
-                // for (int r = 5 + unused; r<16; r++) {
-                //     final[v++] = answer[r];
-                // }
-
-                // printf("%s", answer);
-                // printf("\n");
+                int unused = 16 - strlen(answer);
+            
+                
+                fprintf(answers_file, "%s", insertZeroes(answer, 5, unused)); 
+                fprintf(answers_file, "%s", "\n");
                 break;
+
                 }
         }   
     
         }
-
-   char* inst1[20] = {"add", "sub", "mov", "mov", "ld", "st", "mul", "div", "rs", "ls", "xor", "or", "and", "not", "cmp", "jmp", "jlt", "jgt", "je", "hlt"};
-    
-        check_errors(instructions,all,inst1);
 
    return 0; 
 }
