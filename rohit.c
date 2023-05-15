@@ -1,35 +1,15 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+#include<string.h>
 
 struct store{
     char opc[20];
     char reg1[6] ; char reg2[6] ; char reg3[6] ;
-    int imm ; char addr[20] ; char label[20] ;
+    int imm ; char addr[50] ; char label[50] ;
 };
 
-char* num_to_binary(int number, int bits) {         //converts given number to binary of n bits
-    char* binary = (char*)malloc(bits + 1);
-    for (int i=0;i<bits;i++) {
-        binary[i] = '0';
-    }
-
-    binary[bits] = '\0';
-
-    for (int i = bits - 1; i >= 0; i--) {
-        if (number % 2 == 1) {
-            binary[i] = '1';
-        }
-        number /= 2;
-    }
-
-    return binary;
-}
- 
 int check_binary(int num){    //not sure if this function is correct or not 
     int flag=0;               //checks if number is 7 bit binary 
-    while (num > 0) {         // preferred to make separate functions to check binary and length 7 
+    while (num > 0) {         //preferred to make separate functions to check binary and length 7 
         if (num % 10 <= 1) { 
             flag=1; 
         }
@@ -59,6 +39,17 @@ int search(int n,int m,char str[],char arr[n][m]){
 }
 
 int main() {
+
+    FILE* errors_file;
+    char fname[] = "errors.txt";
+
+    errors_file = fopen(fname, "w");
+
+
+    if (errors_file == NULL) {
+        printf("Failed to open the error file");
+    }
+
     int p = 0;
     char filename[] = "data.txt";
     char line[100];
@@ -76,30 +67,79 @@ int main() {
     int var_counter=0;
     char var_arr[200][200]; 
     int label_counter=0; int l=0;
-    char label_arr[200][200];
-    char valid_label[128][128];
-    int label_line[128];
-
+    char label_arr[200][200];      //label used
+    char valid_label[200][200];    //label defined
+    int label_line[200];
+    char error_arr[200][200];
+    int err=0;
 
     char jump_inst[4][4]={"jmp","jlt","jgt","je"};
+    char inst[25][10]={"var","add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not",
+    "cmp","jmp","jlt","jgt","je","hlt"};
+    char* inst1[25][10]={"add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not",
+    "cmp","jmp","jlt","jgt","je","hlt"};
     char reg_arr[8][6]={"R0","R1","R2","R3","R4","R5","R6","FLAGS"};
+
 
     while (fgets(line, sizeof(line), fp) != NULL) {
 
-        line[strcspn(line, "\n")] = '\0';
+        line[strcspn(line, "\n")] = '\0'; 
 
         if(strlen(line)>0) {
-        char*string[7];
+        char string[10][20];
         char *token = strtok(line, " "); 
-        int count=0;
-        while (token != NULL) {
-            string[count]=token;
-            //printf("%s\n", token);
+        char save[50]="NULL";
+        //printf("%s ",token);
+        if(search(25,10,token,inst)) 
+        {
+            strcpy(string[0],token);
+            //printf("%s ",string[0]);
+        }
+        else if (token[strlen(token)-1]==':') 
+        {
+            strcpy(save,token);
+            char label[strlen(token)];
+            for(int x=0 ; x<(strlen(token)-1) ; x++) 
+            {
+                label[x]=token[x];
+            } 
+                label[strlen(token)-1]='\0';
+                strcpy(valid_label[l],label);  //array of label defined
+                label_line[l] = instructions;
+                l++; 
+
+            //strcpy(all[i].label,label);
+            //printf("%s\n",all[i].label);
+        }
+        token=strtok(NULL, " ");  
+        if(search(25,10,token,inst)) 
+        {
+            strcpy(string[0],token);
+            token = strtok(NULL, " "); 
+            //printf("%s ",string[0]);
+        }
+        
+        int count=1;
+        //printf("%s ",token);
+        while (token != NULL) 
+        {  
+            strcpy(string[count],token);
+            //printf("%s ", token);
+            //printf("%s ",string[count]);
             token = strtok(NULL, " ");
             count++;
         }
+        //printf("\n");
+        if (strcmp(save,"NULL")!=0) 
+        {
+            //strcpy(string[count],save);
+            count++;
+        }
         
-        strcpy(all[i].opc,string[0]);
+        //for (int j=0;j<count;j++) printf("%s ", string[j]);
+            //printf("\n");
+
+        strcpy(all[i].opc,string[0]); 
         
         //initialising all to be null
         strcpy(all[i].reg1,"NULL\0");
@@ -121,22 +161,15 @@ int main() {
         if (search(4,4,all[i].opc,jump_inst)==1) 
         {
             strcpy(all[i].label,string[1]);
-            strcpy(label_arr[label_counter],string[1]);  //array of labels
+            strcpy(label_arr[label_counter],string[1]);  //array of labels used
             label_counter++; 
         }
 
-        if(all[i].opc[strlen(all[i].opc)-1]==':') 
-        {
-            char label[strlen(all[i].opc)];
-            for(int x=0 ; x<(strlen(all[i].opc)-1) ; x++) {
-                label[x]=all[i].opc[x];
-            } 
-            label[strlen(all[i].opc)]='\0';
-
-            strcpy(valid_label[l],label);
-            label_line[l] = instructions;
-            l++;
-        }
+        char typeA[10][10]={"add","sub","mul","xor","or","and"};
+        char typeB[10][10]={"mov","rs","ls"};
+        char typeC[10][10]={"mov","div","cmp"};
+        char typeD[10][10]={"ld","st"};
+        char typeE[10][10]={"jlt","jgt","je","jmp"}; //typeF halt
 
         for (int j=1;j<count;j++) 
         {   
@@ -145,6 +178,68 @@ int main() {
                 if (j==1) strcpy(all[i].reg1,string[j]);
                 if (j==2) strcpy(all[i].reg2,string[j]);
                 if (j==3) strcpy(all[i].reg3,string[j]);
+            }
+            else // invalid registers
+            {
+                if (search(10,10,all[i].opc,typeA))
+                {
+                    char str1[100];
+                    sprintf(str1,"line %d : invalid register %s\n",i+1,string[j]);
+                    fprintf(errors_file, "%s", str1); 
+                    //fputs(str1,errors_file);
+                    exit(1);
+                }
+
+                else if (search(10,10,all[i].opc,typeB))
+                {
+                    if (j==1) 
+                    {
+                        char str1[100];
+                        sprintf(str1,"line %d : invalid register %s\n",i+1,string[j]);
+                        fprintf(errors_file, "%s", str1); 
+                        //fputs(str1,errors_file);
+                        exit(1);
+                    }
+                    if (!strcmp(all[i].opc,"mov"))
+                    {
+                        if ((j==2) && (string[j][0]!='$')) 
+                        {
+                            char str1[100];
+                            sprintf(str1,"line %d : invalid register %s\n",i+1,string[j]);
+                            printf("%s",str1);
+                            fprintf(errors_file, "%s", str1); 
+                            //fputs(str1,errors_file);
+                            exit(1);
+                        }
+                    }
+                    
+                }
+
+                else if (search(10,10,all[i].opc,typeC))
+                {
+                    char str1[100];
+                    sprintf(str1,"line %d : invalid register %s\n",i+1,string[j]);
+                    //printf("%s",str1);
+                    fprintf(errors_file, "%s", str1);
+                    //fputs(str1,errors_file); 
+                    exit(1);
+                }
+
+                else if (search(10,10,all[i].opc,typeD))
+                {
+                    if (j==1) 
+                    {
+                    char str1[100];
+                    sprintf(str1,"line %d : invalid register %s\n",i+1,string[j]);
+                    //printf("%s",str1);
+                    fprintf(errors_file, "%s", str1);
+                    //fputs(str1,errors_file);
+                    exit(1);
+                    }
+
+                }
+
+
             }
             
             if (string[j][0]=='$') 
@@ -159,27 +254,21 @@ int main() {
         }
 
         i++; instructions++;
-}}
+    }
+}
 
     fclose(fp);
 
-    // for (int j=0 ; j<l ; j++){
-    //     printf("%s\n",valid_label[j]);
-    // }
-    // printf("\n");
-    // for (int j=0 ; j<l ; j++){
-    //     printf("%d\n",label_line[j]);
-    // }
-    // printf("\n");
-    
-    // for (int j=0 ; j<var_counter ; j++){
-    //     printf("%s", var_arr[j]);
-    // }
-
-    char* var_addresses[var_counter];
-
-    for (int i=0; i<var_counter;i++) {
-        var_addresses[i] = num_to_binary(instructions + i, 7);
+    /*for (int j=0 ; j<l ; j++){
+        printf("%s\n",valid_label[j]);
+    }
+    printf("\n");
+    for (int j=0 ; j<l ; j++){
+        printf("%d\n",label_line[j]); //counting from 0
+    }
+    printf("\n");
+    /*for (int j=0 ; j<var_counter ; j++){
+        printf("%s ",var_arr[j]);
     }
     
     for (int j=0;j<instructions;j++) {
@@ -191,77 +280,120 @@ int main() {
         printf("memory address - %s\n",all[j].addr);
         printf("label - %s\n",all[j].label);
         printf("\n");
-    }
-    
-    //checking for errors here
+    }*/
 
-    char opinstructions[25][10] = {"add", "sub", "mov", "mov", "ld", "st", "mul", "div", "rs", "ls", "xor", "or", "and", "not", "cmp", "jmp", "jlt", "jgt", "je", "hlt"};
+        char typeA[10][10]={"add","sub","mul","xor","or","and"};
+        char typeB[10][10]={"mov","rs","ls"};
+        char typeC[10][10]={"mov","div","cmp"};
+        char typeD[10][10]={"ld","st"};
+        char typeE[10][10]={"jlt","jgt","je","jmp"}; //typeF halt
+        for(int j=0 ; j<instructions ; j++)
+        {
 
+        // illegal use of flag 
 
-    FILE* errors_file;
-    char fname[] = "errors.txt";
-
-    errors_file = fopen(fname, "w");
-
-
-    if (errors_file == NULL) {
-        printf("Failed to open the error file");
-    }
-
-    int label_count = l; //no. of labels //important
-
-    int flag_halt = 0;
-
-    for(int i=0;i<instructions;i++) {
-
-    if (strcmp(all[i].opc,"hlt")==0) {
-        flag_halt = 1;
-        if(strcmp(all[instructions-1].opc, "hlt")!=0) {
-            fprintf(errors_file, "%s", "hlt not at the end"); 
-            exit(1);
+        if ((!strcmp(all[j].reg1,"FLAGS"))||(!strcmp(all[j].reg2,"FLAGS"))||(!strcmp(all[j].reg3,"FLAGS")))
+        {
+            if (strcmp(all[j].opc,"mov")!=0)
+            {
+                char str1[100];
+                sprintf(str1,"line %d : illegal use of flag\n",j+1);
+                //printf("%s",str1);
+                fprintf(errors_file, "%s", str1);
+                //fputs(str1,errors_file); 
+                exit(1);
+                
             }
+            
+
+            else 
+            {
+                if ((!strcmp(all[j].reg1,"FLAGS"))|| (!strcmp(all[j].reg3,"FLAGS")))
+                {
+                char str1[100];
+                sprintf(str1,"line %d : illegal use of flag\n",j+1);
+                //printf("%s",str1);
+                fprintf(errors_file, "%s", str1);
+                //fputs(str1,errors_file); 
+                exit(1);
+                
+                }
+            }
+        }
+
+        // syntax error 
+        if (search(10,10,all[j].opc,typeA)) 
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].reg2,"NULL"))||(!strcmp(all[j].reg3,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                
+            }
+        }
+
+        else if (!strcmp(all[j].opc,"mov"))
+        {
+            if (!strcmp(all[j].reg1,"NULL"))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+            else if ((!strcmp(all[j].reg2,"NULL"))&&(all[j].imm==-1))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+        else if (search(10,10,all[j].opc,typeB))
+        {
+            if ((!strcmp(all[j].reg1,"NULL")) || (all[j].imm==-1))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+
+        else if (search(10,10,all[j].opc,typeC))
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].reg2,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);    
+            }
+        }
+        else if (search(10,10,all[j].opc,typeD))
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].addr,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+        else if (search(10,10,all[j].opc,typeE))
+        {
+            if(!strcmp(all[j].label,"NULL")) 
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
     }
-}
+    fclose(errors_file); 
 
-if (flag_halt==0) {
-        fprintf(errors_file, "%s", "halt is not present"); 
-        exit(1);
-    }
-
-
-//     int flag_lab = 0;
-
-//     for (int i=0;i<instructions;i++) {
-//         if (strcmp(all[i].opc, "jmp")==0 || strcmp(all[i].opc, "jlt")==0 || strcmp(all[i].opc, "jgt")==0 || strcmp(all[i].opc, "je")==0) {
-
-//             if (strcmp(all[i].label, "NULL")!=0) {
-
-//             for (int j=0; j<label_count; j++) {
-//                 if (strcmp(all[i].label, valid_label[j])==0) flag_lab = 1;
-//             }
-//         }
-
-//             else {
-//                 flag_lab = 1;
-//             }
-    
-//         if (flag_lab==0) {
-//             fprintf(errors_file, "%s", "label used in jump instructions is not defined"); 
-//             exit(1);
-//         }
-
-//         flag_lab = 0;
-//     }
-
-// }
-
-fclose(errors_file);
-
-
-
-
-   //kindly check for errors before this point and stop execution if any are found
-
-   return 0; 
+    return 0; 
 }
 
