@@ -1,6 +1,7 @@
 var xyz
 var X
-var p
+var P
+
 
 add R1 FLAGS
 sub FLAGS R2
@@ -10,10 +11,11 @@ jmp label1
 je 1010011
 ld R1 1100001
 mov R1 $12
+je label2
 
 mul R1 R2 R3
 st R3 X
-label:  
 mov R2 $10
 mov R3 $12
 sub R2 R3
+hlt
