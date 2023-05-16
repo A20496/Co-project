@@ -447,8 +447,269 @@ int main() {
             }
         }
     }
+int flag_op = 0;
+
+    for (int i=0;i<instructions;i++) {
+            if (strcmp(all[i].opc, "var")!=0) {
+                for (int j=0; j<20; j++) {
+                    if (strcmp(all[i].opc, opinstructions[j])==0) {
+                        flag_op = 1;
+                    }
+                }
+            }
+
+            else {
+                flag_op = 1;
+            }
+
+        if (flag_op == 0) {
+            char str2[30];
+            char num2[10];
+            sprintf(num2, "%d", i+1);
+            strcat(str2, "line ");
+            strcat(str2, num2);
+            strcat(str2, " : typo in opcode");
+
+           fprintf(errors_file, "%s", str2); 
+           exit(1);
+        }
+
+        flag_op = 0;
+
+    }
+
+    int flag_varb = 0;
+
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc, "ld")==0 || strcmp(all[i].opc, "st")==0) {
+
+            if (strcmp(all[i].addr, "NULL")!=0) {
+
+            for (int j=0; j<var_counter; j++) {
+                if (strcmp(all[i].addr, var_arr[j])==0) flag_varb = 1;
+            }
+        }
+
+            else {
+                flag_varb = 1;
+            }
+
+        if (flag_varb==0) {
+
+            char str3[30];
+            char num3[10];
+            sprintf(num3, "%d", i+1);
+            strcat(str3, "line ");
+            strcat(str3, num3);
+            strcat(str3, " : memory address in load and store is not a variable");
 
 
-    return 0;
+            fprintf(errors_file, "%s", str3); 
+            exit(1);
+        }
 
+        flag_varb = 0;
+    }
+
+}
+
+    int label_count = l; //no. of labels //important
+
+    for(int t=0;t<instructions;t++) {
+        if (all[t].imm!=-1) {
+        if (all[t].imm > 127 || all[t].imm < 0) {
+
+            char str4[30];
+            char num4[10];
+            sprintf(num4, "%d", t+1);
+            strcat(str4, "line ");
+            strcat(str4, num4);
+            strcat(str4, " : value not in the inclusive range of 0 to 127");
+
+            fprintf(errors_file, "%s", str4); 
+            exit(1);
+            }
+        }
+    }
+
+    int flag_halt = 0;
+    int flag_line;
+    for(int i=0;i<instructions;i++) {
+
+    if (strcmp(all[i].opc,"hlt")==0) {
+        flag_halt = 1;
+        flag_line = i;
+        if(strcmp(all[instructions-1].opc, "hlt")!=0) {
+
+            char str5[30];
+            char num5[10];
+            sprintf(num5, "%d", i+1);
+            strcat(str5, "line ");
+            strcat(str5, num5);
+            strcat(str5, " : hlt not at the end");
+
+            fprintf(errors_file, "%s", str5); 
+            exit(1);
+            }
+    }
+}
+
+if (flag_halt==0) {
+        fprintf(errors_file, "%s", "halt is not present"); 
+        exit(1);
+    }
+
+
+    int flag_lab = 0;
+
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc, "jmp")==0 || strcmp(all[i].opc, "jlt")==0 || strcmp(all[i].opc, "jgt")==0 || strcmp(all[i].opc, "je")==0) {
+
+            if (strcmp(all[i].label, "NULL")!=0) {
+                
+            for (int j=0; j<l; j++) {
+                if (strcmp(all[i].label, valid_label[j])==0) flag_lab = 1;
+            }
+        }
+
+            else {
+                flag_lab = 1;
+            }
+
+        if (flag_lab==0) {
+            char str_[30];
+            char num[10];
+            sprintf(num, "%d", instructions+1);
+            strcat(str_, "line ");
+            strcat(str_, num);
+            strcat(str_, " : label used in jump instructions is not defined");
+            fprintf(errors_file, "%s", str_); 
+            exit(1);
+        }
+
+        flag_lab = 0;
+    }
+}
+        int flag1;
+        int flag2;
+        int flag3;
+    for (int i=0;i<instructions;i++) {
+        flag1 = 0;
+        flag2 = 0;
+        flag3 = 0;
+        if (strcmp(all[i].reg1, "NULL")!=0) {
+            for (int p=0;p<8;p++) {
+                if (strcmp(all[i].reg1, reg_arr[p])==0) {
+                    flag1 = 1;
+                }
+            }
+        }
+        else flag1 = 1;
+
+        if (strcmp(all[i].reg2, "NULL")!=0) {
+            for (int p=0;p<8;p++) {
+                if (strcmp(all[i].reg2, reg_arr[p])==0) {
+                    flag2 = 1;
+                }
+            }
+        }
+        else flag2 = 1;
+
+        if (strcmp(all[i].reg3, "NULL")!=0) {
+            for (int p=0;p<8;p++) {
+                if (strcmp(all[i].reg3, reg_arr[p])==0) {
+                    flag3 = 1;
+                }
+            }
+        }
+        else flag3 = 1;
+
+    }
+
+    if (flag1 == 0 || flag2 == 0 || flag3 == 0) {
+            char str7[30];
+            char num7[10];
+            sprintf(num7, "%d", i+1);
+            strcat(str7, "line ");
+            strcat(str7, num7);
+            strcat(str7, " : wrong register name");
+            fprintf(errors_file, "%s", str7); 
+            exit(1);
+    }
+
+
+fclose(errors_file);
+
+   //kindly check for errors before this point and stop execution if any are found
+
+
+   char* label_addresses[label_count];
+   for (int i=0; i<l;i++) {
+        label_addresses[i] = num_to_binary(label_line[i], 7);
+   }
+
+
+    char *answers[128];
+    int answer_count;
+    int address_count[128];
+    int flag;
+
+
+
+    for (int i=0;i<instructions;i++) {
+        char opcodes[25][10] = {"00000", "00001", "00010", "00011", "00100", "00101", "00110", "00111", "01000", "01001", "01010", "01011", "01100", "01101", "01110", "01111", "11100", "11101", "11111", "11010"};
+        char *answer;
+        for (int j=0;j<20;j++) {
+            if (strcmp(all[i].opc, opinstructions[j])==0) {
+                answer = opcodes[j];
+                if (strcmp(all[i].reg1, "NULL")!=0) {
+                    if (strcmp(all[i].reg1, "FLAGS")==0) strcat(answer, "111");
+                    else {
+                    // char* temp_ = all[i].reg1[1];
+                    strcat(answer, num_to_binary(all[i].reg1[1], 3));
+                    }
+                }
+                if (strcmp(all[i].reg2, "NULL")!=0) {
+                    if (strcmp(all[i].reg2, "FLAGS")==0) strcat(answer, "111");
+                    else {
+                    // char* temp_ = all[i].reg1[2];
+                    strcat(answer, num_to_binary(all[i].reg2[1], 3));
+                    }
+                }
+                if (strcmp(all[i].reg3, "NULL")!=0) {
+                    if (strcmp(all[i].reg3, "FLAGS")==0) strcat(answer, "111");
+                else {
+                    // char* temp_ = all[i].reg3[1];
+                    strcat(answer, num_to_binary(all[i].reg3[1], 3));
+                }
+            }
+                if (all[i].imm != -1) strcat(answer, num_to_binary(all[i].imm, 7));
+                if (strcmp(all[i].addr,"NULL")!=0) {
+                    for (int k=0;k<var_counter;k++) {
+                        if (strcmp(all[i].addr, var_arr[k])==0) strcat(answer, var_addresses[k]);
+                    }
+                }
+                if (strcmp(all[i].label, "NULL")!=0) {
+                    for (int k=0; k<label_count; k++) {
+                        if (strcmp(all[i].label, label_arr[k])==0) strcat(answer, label_addresses[k]);
+                    }
+                }
+
+                if (strcmp(answer, "11010")==0) {
+                    strcat(answer, "00000000000");
+                }
+
+                int unused = 16 - strlen(answer);
+
+
+                fprintf(answers_file, "%s", insertZeroes(answer, 5, unused)); 
+                fprintf(answers_file, "%s", "\n");
+                break;
+
+                }
+        }   
+
+        }
+
+   return 0; 
 }
