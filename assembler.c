@@ -1,0 +1,220 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+struct store{
+    char opc[20];
+    char reg1[6] ; char reg2[6] ; char reg3[6] ;
+    int imm ; char addr[50] ; char label[50] ;
+};
+
+int main() {
+
+    //opening files here
+
+    FILE* answers_file;
+    char fname3[] = "answers.txt";
+
+    answers_file = fopen(fname3, "w");
+
+
+    if (answers_file == NULL) {
+        printf("Failed to open the error file");
+    }
+
+
+    FILE* errors_file;
+    char fname[] = "errors.txt";
+
+    errors_file = fopen(fname, "w");
+
+
+    if (errors_file == NULL) {
+        printf("Failed to open the error file");
+    }
+
+    int p = 0;
+    char filename[] = "data.txt";
+    char line[100];
+    struct store all[500];
+
+    FILE *fp = fopen(filename, "r");
+
+    if (fp == NULL) { 
+        printf("Error opening file %s\n", filename);
+        return 1;
+    }
+
+    //finished opening files
+
+    int i=0;
+    int instructions=0;
+    int var_counter=0;
+    char var_arr[200][200]; 
+    int label_counter=0; int l=0;
+    char label_arr[200][200];      //label used
+    char valid_label[200][200];    //label defined
+    int label_line[200];
+    char error_arr[200][200];
+    int err=0;
+
+    char jump_inst[4][4]={"jmp","jlt","jgt","je"};
+    char inst[25][10]={"var","add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not",
+    "cmp","jmp","jlt","jgt","je","hlt"};
+    char* inst1[25][10]={"add","sub","mov","ld","st","mul","div","rs","ls","xor","or","and","not",
+    "cmp","jmp","jlt","jgt","je","hlt"};
+    char reg_arr[8][6]={"R0","R1","R2","R3","R4","R5","R6","FLAGS"};
+
+
+    while (fgets(line, sizeof(line), fp) != NULL) {
+
+        line[strcspn(line, "\n")] = '\0'; 
+
+        if(strlen(line)>0) {
+        char string[10][20];
+        char *token = strtok(line, " "); 
+        char save[50]="NULL";
+        //printf("%s ",token);
+        if(search(25,10,token,inst)) 
+        {
+            strcpy(string[0],token);
+            //printf("%s ",string[0]);
+        }
+        else if (token[strlen(token)-1]==':') 
+        {
+            strcpy(save,token);
+            char label[strlen(token)];
+            for(int x=0 ; x<(strlen(token)-1) ; x++) 
+            {
+                label[x]=token[x];
+            } 
+                label[strlen(token)-1]='\0';
+                strcpy(valid_label[l],label);  //array of label defined
+                label_line[l] = instructions;
+                l++; 
+
+            //strcpy(all[i].label,label);
+            //printf("%s\n",all[i].label);
+        }
+        token=strtok(NULL, " ");
+        if (token)
+        {
+            //printf("%s ",token);
+          if(search(25,10,token,inst)) 
+        {
+            strcpy(string[0],token);
+            token = strtok(NULL, " "); 
+            //printf("%s ",string[0]);
+        }
+          
+        }  
+
+        
+        int count=1;
+        //printf("%s ",token);
+        while (token != NULL) 
+        {  
+            strcpy(string[count],token);
+            //printf("%s ", token);
+            //printf("%s ",string[count]);
+            token = strtok(NULL, " ");
+            count++;
+        }
+        //printf("\n");
+        if (strcmp(save,"NULL")!=0) 
+        {
+            //strcpy(string[count],save);
+            count++;
+        }
+
+        //printf("\n%d\n ",count);
+        
+        //for (int j=0;j<count;j++) printf("%s ", string[j]);
+            //printf("\n");
+
+        strcpy(all[i].opc,string[0]); 
+        
+        //initialising all to be null
+        strcpy(all[i].reg1,"NULL\0");
+        strcpy(all[i].reg2,"NULL\0");
+        strcpy(all[i].reg3,"NULL\0");
+        strcpy(all[i].addr,"NULL\0");
+        strcpy(all[i].label,"NULL\0"); 
+        all[i].imm=-1; //since imm is an integer value
+
+        if (strcmp(all[i].opc,"var")==0)    //array of all the variables 
+        { 
+            strcpy(var_arr[var_counter],string[1]); 
+            strcpy(all[i].addr,string[1]);
+            var_counter++;
+        }
+
+        if ((strcmp(all[i].opc,"ld")==0) || (strcmp(all[i].opc,"st")==0)) strcpy(all[i].addr,string[2]);
+
+        if (search(4,4,all[i].opc,jump_inst)==1) 
+        {
+            strcpy(all[i].label,string[1]);
+            strcpy(label_arr[label_counter],string[1]);  //array of labels used
+            label_counter++; 
+        }
+
+        if (search(label_counter,200,string[0],label_arr)==1){
+                //to check colon after label
+                char* label=string[0];
+                int ll=strlen(label);
+                if (label[ll-1]!=":"){
+                    printf("Label needs ':' to be valid");
+               }
+    }
+
+        char typeA[10][10]={"add","sub","mul","xor","or","and"};
+        char typeB[10][10]={"mov","rs","ls"};
+        char typeC[10][10]={"mov","div","cmp"};
+        char typeD[10][10]={"ld","st"};
+        char typeE[10][10]={"jlt","jgt","je","jmp"}; //typeF halt
+        
+
+        for (int j=1;j<count;j++) 
+        {   
+            if (search(9,6,string[j],reg_arr)) 
+            {
+                if (j==1) strcpy(all[i].reg1,string[j]);
+                if (j==2) strcpy(all[i].reg2,string[j]);
+                if (j==3) strcpy(all[i].reg3,string[j]);
+            }
+            
+            
+            if (string[j][0]=='$') 
+            {
+                char newarr[20];
+                for(int k=1,h=0 ; k<sizeof(string[j]) ; k++,h++) 
+                    newarr[h]=string[j][k];
+                newarr[sizeof(string[j])]='\0';
+                int num = atoi(newarr) ;
+                all[i].imm=num;
+            }
+        }
+
+        i++; instructions++;
+    }
+//printf("y\n");
+}
+
+    fclose(fp);
+
+    /*for (int j=0 ; j<l ; j++){
+        printf("%s\n",valid_label[j]);
+    }
+    printf("\n");
+    for (int j=0 ; j<l ; j++){
+        printf("%d\n",label_line[j]); //counting from 0
+    }
+    printf("\n");
+    /*for (int j=0 ; j<var_counter ; j++){
+        printf("%s ",var_arr[j]);
+    }*/
+    //printf("y\n");
+
+    return 0;
+
+}
