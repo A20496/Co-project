@@ -8,6 +8,79 @@ struct store{
     int imm ; char addr[50] ; char label[50] ;
 };
 
+char* insertZeroes(const char* str, int i, int n) {
+    int len = strlen(str);
+    int newLen = len + n;
+    char* newStr = (char*)malloc((newLen + 1) * sizeof(char));
+    int j, k;
+
+    if (i < 0 || i > len) {
+        printf("Invalid position.\n");
+        return NULL;
+    }
+
+    for (j = 0, k = 0; j < newLen; j++) {
+        if (j >= i && j < i + n) {
+            newStr[j] = '0';
+        } else {
+            newStr[j] = str[k];
+            k++;
+        }
+    }
+
+    newStr[newLen] = '\0';
+    return newStr;
+}
+
+char* num_to_binary(int number, int bits) {         //converts given number to binary of n bits
+    char* binary = (char*)malloc(bits + 1);
+    for (int i=0;i<bits;i++) {
+        binary[i] = '0';
+    }
+
+    binary[bits] = '\0';
+
+    for (int i = bits - 1; i >= 0; i--) {
+        if (number % 2 == 1) {
+            binary[i] = '1';
+        }
+        number /= 2;
+    }
+
+    return binary;
+}
+
+int check_binary(int num){    //not sure if this function is correct or not 
+    int flag=0;               //checks if number is 7 bit binary 
+    while (num > 0) {         //preferred to make separate functions to check binary and length 7 
+        if (num % 10 <= 1) { 
+            flag=1; 
+        }
+        num /= 10; 
+    }
+    int len=0; 
+    if (flag==1)
+    {
+        while(num>0){
+            len++;
+            num/=10;
+        }
+        if(len==7) flag=1;
+        else flag=0;
+    }
+    return flag;
+}
+
+int search(int n,int m,char str[],char arr[n][m]){  
+    int flag=0;                           //checks if given string is present in an array of string or not
+    for (int i=0 ; i<n ; i++){
+        if(strcmp(str,arr[i])==0) {
+            flag=1;
+        }
+    }
+    return flag;
+}
+
 int main() {
 
     //opening files here
