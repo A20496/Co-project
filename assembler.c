@@ -288,6 +288,167 @@ int main() {
     }*/
     //printf("y\n");
 
+        char* var_addresses[var_counter];
+
+    for (int i=0; i<var_counter;i++) {
+        var_addresses[i] = num_to_binary(instructions + i - 1, 7);
+    }
+
+    // for (int j=0;j<instructions;j++) {
+    //     printf("opcode - %s\n",all[j].opc);
+    //     printf("register one - %s\n",all[j].reg1);
+    //     printf("register two - %s\n",all[j].reg2);
+    //     printf("register three - %s\n",all[j].reg3);
+    //     printf("immediate value - %d\n",all[j].imm);
+    //     printf("memory address - %s\n",all[j].addr);
+    //     printf("label - %s\n",all[j].label);
+    //     printf("\n");
+    // }
+
+
+        char typeA[10][10]={"add","sub","mul","xor","or","and"};
+        char typeB[10][10]={"mov","rs","ls"};
+        char typeC[10][10]={"mov","div","cmp"};
+        char typeD[10][10]={"ld","st"};
+        char typeE[10][10]={"jlt","jgt","je","jmp"}; //typeF halt
+
+
+        for(int j=0 ; j<instructions ; j++)
+        {
+
+        // illegal use of flag 
+
+        if ((!strcmp(all[j].reg1,"FLAGS"))||(!strcmp(all[j].reg2,"FLAGS"))||(!strcmp(all[j].reg3,"FLAGS")))
+        {
+            if (strcmp(all[j].opc,"mov")!=0)
+            {
+                char str1[100];
+                sprintf(str1,"line %d : illegal use of flag\n",j+1);
+                //printf("%s",str1);
+                fprintf(errors_file, "%s", str1);
+                //fputs(str1,errors_file); 
+                exit(1);
+                
+            }
+            
+
+            else 
+            {
+                if ((!strcmp(all[j].reg1,"FLAGS"))|| (!strcmp(all[j].reg3,"FLAGS")))
+                {
+                char str1[100];
+                sprintf(str1,"line %d : illegal use of flag\n",j+1);
+                //printf("%s",str1);
+                fprintf(errors_file, "%s", str1);
+                //fputs(str1,errors_file); 
+                exit(1);
+                
+                }
+            }
+        }
+
+        // syntax error 
+        if (search(10,10,all[j].opc,typeA)) 
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].reg2,"NULL"))||(!strcmp(all[j].reg3,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                
+            }
+        }
+
+        else if (!strcmp(all[j].opc,"mov"))
+        {
+            if (!strcmp(all[j].reg1,"NULL"))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+            else if ((!strcmp(all[j].reg2,"NULL"))&&(all[j].imm==-1))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+        else if (search(10,10,all[j].opc,typeB))
+        {
+            if ((!strcmp(all[j].reg1,"NULL")) || (all[j].imm==-1))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+
+        else if (search(10,10,all[j].opc,typeC))
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].reg2,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);    
+            }
+        }
+        else if (search(10,10,all[j].opc,typeD))
+        {
+            if ((!strcmp(all[j].reg1,"NULL"))||(!strcmp(all[j].addr,"NULL")))
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+        else if (search(10,10,all[j].opc,typeE))
+        {
+            if(!strcmp(all[j].label,"NULL")) 
+            {
+                char str1[100];
+                sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
+                fprintf(errors_file, "%s", str1); 
+                exit(1);
+            }
+        }
+    }
+    for (int k=0;k<var_counter;k++){
+                if (search(label_counter,200,label_arr[k], var_arr)==1){
+                   printf("misuse of labels and variables"); 
+               }
+    }
+
+ char opinstructions[25][10] = {"add", "sub", "mov", "mov", "ld", "st", "mul", "div", "rs", "ls", "xor", "or", "and", "not", "cmp", "jmp", "jlt", "jgt", "je", "hlt"};
+
+    //checking for errors below this point
+
+
+    int flag_v = 0;
+    for (int i=0;i<instructions;i++) {
+        if (strcmp(all[i].opc,"var")!=0) {
+            flag_v = 1;
+        }
+        if (flag_v == 1) {
+            if (strcmp(all[i].opc, "var")==0) {
+            char str__[30];
+            char num1[10];
+            sprintf(num1, "%d", i+1);
+            strcat(str__, "line ");
+            strcat(str__, num1);
+            strcat(str__, " : var defined at wrong place");
+                fprintf(errors_file, "%s", str__);
+                exit(1);
+            }
+        }
+    }
+
+
     return 0;
 
 }
