@@ -197,10 +197,6 @@ int main() {
         strcpy(all[i].label,"NULL\0"); 
         all[i].imm=-1; //since imm is an integer value
 
-        if (strcmp(all[i].opc, "hlt")==0) {
-            instructions++;
-            break;
-        }
 
         if (strcmp(all[i].opc,"var")==0)    //array of all the variables 
         { 
@@ -291,8 +287,7 @@ int main() {
         // printf("memory address - %s\n",all[j].addr);
         // printf("label - %s\n",all[j].label);
         // printf("\n");
-     //}
-
+     
 
         char typeA[10][10]={"add","sub","mul","xor","or","and"};
         char typeB[10][10]={"mov","rs","ls"};
@@ -312,8 +307,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : illegal use of flag\n",j+1);
-                //printf("%s",str1);
-                fprintf(stdout, str1);
+                printf("%s",str1);
+                // fprintf(stdout, str1);
                 //fputs(str1,errors_file); 
                 exit(1); 
                 
@@ -326,8 +321,8 @@ int main() {
                 {
                 char str1[100];
                 sprintf(str1,"line %d : illegal use of flag\n",j+1);
-                //printf("%s",str1);
-                fprintf(stdout, str1);
+                printf("%s",str1);
+                // fprintf(stdout, str1);
                 //fputs(str1,errors_file); 
                 exit(1);
                 
@@ -342,7 +337,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
                 
             }
@@ -354,14 +350,16 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
             }
             else if ((!strcmp(all[j].reg2,"NULL"))&&(all[j].imm==-1))
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
             }
         }
@@ -371,7 +369,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
             }
         }
@@ -382,7 +381,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1);
+                // fprintf(stdout,str1);
+                printf("%s", str1);
                 exit(1);    
             }
         }
@@ -392,7 +392,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
             }
         }
@@ -402,7 +403,8 @@ int main() {
             {
                 char str1[100];
                 sprintf(str1,"line %d : syntax error/invalid register name\n",j+1);
-                fprintf(stdout,str1); 
+                // fprintf(stdout,str1); 
+                printf("%s", str1);
                 exit(1);
             }
         }
@@ -410,7 +412,8 @@ int main() {
     for (int k=0;k<var_counter;k++){
                 if (search(label_counter,200,label_arr[k], var_arr)==1){
                    char str1[]="misuse of label and variable";
-                   fprintf(stdout,str1);
+                //    fprintf(stdout,str1);
+                printf("%s", str1);
                    exit(1); 
                }
     }
@@ -433,7 +436,8 @@ int main() {
             strcat(str__, "line ");
             strcat(str__, num1);
             strcat(str__, " : var defined at wrong place");
-                fprintf(stdout,str__);
+                // fprintf(stdout,str__);
+                printf("%s", str__);
                 exit(1);
             }
         }
@@ -461,7 +465,8 @@ int flag_op = 0;
             strcat(str2, num2);
             strcat(str2, " : typo in opcode");
 
-           fprintf(stdout, str2); 
+        //    fprintf(stdout, str2); 
+        printf("%s", str2);
            exit(1);
         }
 
@@ -487,7 +492,7 @@ int flag_op = 0;
 
         if (flag_varb==0) {
 
-            char str3[30];
+            char str3[100];
             char num3[10];
             sprintf(num3, "%d", i+1);
             strcat(str3, "line ");
@@ -495,7 +500,8 @@ int flag_op = 0;
             strcat(str3, " : memory address in load and store is not a variable");
 
 
-            fprintf(stdout, str3); 
+            // fprintf(stdout, str3); 
+            printf("%s", str3);
             exit(1);
         }
 
@@ -510,14 +516,15 @@ int flag_op = 0;
         if (all[t].imm!=-1) {
         if (all[t].imm > 127 || all[t].imm < 0) {
 
-            char str4[30];
+            char str4[100];
             char num4[10];
             sprintf(num4, "%d", t+1);
             strcat(str4, "line ");
             strcat(str4, num4);
             strcat(str4, " : value not in the inclusive range of 0 to 127");
 
-            fprintf(stdout, str4); 
+            // fprintf(stdout, str4); 
+            printf("%s", str4);
             exit(1);
             }
         }
@@ -539,14 +546,16 @@ int flag_op = 0;
             strcat(str5, num5);
             strcat(str5, " : hlt not at the end");
 
-            fprintf(stdout, str5); 
+            // fprintf(stdout, str5); 
+            printf("%s", str5);
             exit(1);
             }
     }
 }
 
 if (flag_halt==0) {
-        fprintf(stdout, "halt is not present"); 
+        // fprintf(stdout, "halt is not present"); 
+        printf("halt is not present");
         exit(1);
     }
 
@@ -568,13 +577,14 @@ if (flag_halt==0) {
             }
 
         if (flag_lab==0) {
-            char str_[30];
+            char str_[100];
             char num[10];
             sprintf(num, "%d", instructions+1);
             strcat(str_, "line ");
             strcat(str_, num);
             strcat(str_, " : label used in jump instructions is not defined");
-            fprintf(stdout, str_); 
+            // fprintf(stdout, str_); 
+            printf("%s", str_);
             exit(1);
         }
 
@@ -624,7 +634,8 @@ if (flag_halt==0) {
             strcat(str7, "line ");
             strcat(str7, num7);
             strcat(str7, " : wrong register name");
-            fprintf(stdout, str7); 
+            // fprintf(stdout, str7); 
+            printf("%s", str7);
             exit(1);
     }
 
@@ -700,9 +711,12 @@ if (flag_halt==0) {
                 int unused = 16 - strlen(answer);
 
 
-                fprintf(stdout, insertZeroes(answer, 5, unused)); 
+                // fprintf(stdout, insertZeroes(answer, 5, unused)); 
+                printf("%s", insertZeroes(answer, 5, unused));
+
                 if (strcmp(answer, "1101000000000000")!=0) {
-                fprintf(stdout, "\n");
+                // fprintf(stdout, "\n");
+                printf("\n");
                 }
                 break;
 
