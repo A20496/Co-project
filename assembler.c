@@ -701,7 +701,9 @@ if (flag_halt==0) {
 
 
                 fprintf(stdout, insertZeroes(answer, 5, unused)); 
+                if (strcmp(answer, "1101000000000000")!=0) {
                 fprintf(stdout, "\n");
+                }
                 break;
 
                 }
