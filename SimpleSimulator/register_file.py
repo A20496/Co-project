@@ -67,16 +67,16 @@ def register_dump(register_dict):
     # 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
 def set_flag(register_dict,index):
-    fList=list(register_dict['111'])
-    fList[index]='1'
-    flags="".join(fList)
-    register_dict['111']=flags
+    slice1=register_dict['111'][0:index]
+    slice2=register_dict['111'][index+1:]
+    flags=slice1+'1'+slice2
+    register_dict['111']=flags 
 
 def check_overflow(dec,register_dict,register_no):
     if (dec>65535 or dec<0):
         set_flag(register_dict,12)
         if (dec<0):
-            reset_val(register_dict,register_no)
+            update_val(register_dict,register_no,'0000000000000000')
 
     else:
         update_val(register_dict,register_no,dectobin(dec))

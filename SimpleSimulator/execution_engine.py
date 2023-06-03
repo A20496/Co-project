@@ -1,36 +1,9 @@
 from register_file import *
 
-'''
-        TYPE A:
-        add:00000
-        sub:00001
-        mul:00110
-        xor:01010
-        or:01011
-        and:01100
-
-        TYPE A:
-        5-BIT OP|2-BIT UNUSED|3BIT REG1|REG2|REG3
-
-        TYPE B:
-        5-BIT OP|3-BIT REG1|8BIT IMMEDIATE
-
-        TYPE C:
-        5-BIT OP|5-BIT UNUSED|3-BIT REG1|REG2
-
-        TYPE D:
-        5-BIT OP|3-BIT REG1|8-BIT MEMORY ADDRESS
-
-        TYPE E:
-        5-BIT OP|3_UNUSED|8-BIT MEMORY ADDRESS
-
-        TYPE F:
-        5-BIT OP|11-BIT UNUSED
-        '''
 
 def typeA(inst,register_dict):
 
-    reset_val(register_dict,'111')
+    update_val(register_dict,'111','0000000000000000')
 
     ''' 
     fetching value of source registers and updating the value of destination register 
