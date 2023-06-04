@@ -3,6 +3,7 @@ from register_file import *
 from execution_engine import *
 
 # --------------- INITIALISING MEMORY ---------------- #
+
 memory_inst = []
 
 while True:
@@ -15,4 +16,5 @@ while True:
 for i in range(128-len(memory_inst)):  
     memory_inst.append('0000000000000000')
 
+print(memory_inst)
 
