@@ -49,7 +49,7 @@ def register_dump(register_dict):
     print(register_dict['100'],end=" ")
     print(register_dict['101'],end=" ")
     print(register_dict['110'],end=" ")
-    print(register_dict['111'],end=" ")
+    print(register_dict['111'])
 
 
 
