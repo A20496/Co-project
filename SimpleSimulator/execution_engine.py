@@ -11,10 +11,10 @@ def typeA(inst,register_dict):
     fetching value of source registers and updating the value of destination register 
     after cheching overflow 
     ''' 
-    val1_dec=fetch_val(register_dict,inst[10:13])
-    val2_dec=fetch_val(register_dict,inst[13:16])
-    val1_bin=bintodec(val1_dec)
-    val2_bin=bintodec(val2_dec)
+    val1_bin = register_dict[inst[10:13]]
+    val2_bin = register_dict[inst[10:13]]
+    val1_dec = bintodec(val1_bin)
+    val2_dec = bintodec(val2_bin)
 
     #ADD 
     if inst[0:5]=='00000':
@@ -35,24 +35,43 @@ def typeA(inst,register_dict):
     elif inst[0:5]=='01011':
         result=val1_bin | val2_bin
         result=bin(result)[2:]
-        update_val(register_dict,inst[7:10],result)
+        register_dict[inst[7:10]] = result
     
     #AND
     elif inst[0:5]=='01100':
         result=val1_bin & val2_bin
         result=bin(result)[2:]
-        update_val(register_dict,inst[7:10],result)
-    
+        register_dict[inst[7:10]] = result
+        
     #XOR
     elif inst[0:5]=='01010':
         result=val1_bin ^ val2_bin
         result=bin(result)[2:]
-        update_val(register_dict,inst[7:10],result)
+        register_dict[inst[7:10]] = result
+        
         
 def typeB(inst, register_dict):
+    # mov immediate
     if inst[0:5] == "00010":
         register_dict[inst[6:9]] = inst[9:]
-    if inst[0:5] == "01000":
+
+    #right shift
+    if inst[0:5] == "01000": 
+        shift_value = bintodec(inst[9:])
+        register_val = bintodec(register_dict[inst[6:9]])
+        right_shifted = register_val >> shift_value
+        right_shifted = "0"*shift_value + right_shifted
+
+        register_dict[inst[6:9]] = right_shifted
+
+    #left shift
+    if inst[0:5] == "01001":
+        shift_value = bintodec(inst[9:])
+        register_val = bintodec(register_dict[inst[6:9]])
+        left_shifted = register_val << shift_value
+        left_shifted = left_shifted[shift_value:]
+
+        register_dict[inst[6:9]] = left_shifted 
         
 
 

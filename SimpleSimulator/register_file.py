@@ -24,19 +24,6 @@ regs={
 
 #--------------- REGISTER FUNCTIONS ------------------- #
 
-''' input a register number and fetching its value in binary '''
-
-def fetch_val(register_dict,register_no):
-    
-    return register_dict[register_no]
-
-
-''' updating the value given in binary of the register number '''
-
-def update_val(register_dict,register_no,value):
-
-    register_dict[register_no]=value
-
 
 ''' printing the values of all the registers '''
 
@@ -70,10 +57,10 @@ def check_overflow(dec,register_dict,register_no):
     if (dec>65535 or dec<0):
         set_flag(register_dict,12)
         if (dec<0):
-            update_val(register_dict,register_no,'0000000000000000')
+            register_dict[register_no]='0000000000000000'
 
     else:
-        update_val(register_dict,register_no,dectobin(dec))
+        register_dict[register_no]=dectobin(dec)
 
 def check_lessThan(n1,n2,register_dict):
     if(n1<n2):
