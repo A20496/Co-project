@@ -1,5 +1,7 @@
 from register_file import *
+from memory_file import *
 
+pc = "0000000"                 #will store memory address
 
 def typeA(inst,register_dict):
 
@@ -48,7 +50,25 @@ def typeA(inst,register_dict):
         update_val(register_dict,inst[7:10],result)
 
 
-    print(register_dict[inst[7:10]])
+def typeE(inst, register_dict, pc):
+    if inst[0:5] == "01111":
+        return inst[9:]
+    if inst[0:5] == "11100":
+        if regs[111][13] == "1":
+            return inst[9:]
+        else:
+            return dectobin(bintodec(pc) + 1)
+    if inst[0:5] == "11101":
+        if regs[111][14] == "1":
+            return inst[9:]
+        else:
+            return dectobin(bintodec(pc) + 1)
+    if inst[0:5] == "11111":
+        if regs[111][15] == "1":
+            return inst[9:]
+        else:
+            return dectobin(bintodec(pc) + 1)
+        
 
 def execute(memory_inst,regs):   # list of memory instructions
     
@@ -56,26 +76,50 @@ def execute(memory_inst,regs):   # list of memory instructions
 
     a = ["00000","00001","00110","01010","01011","01100"]
     b = ["00010","01000","01001"]
-    c = ["00011","00111","01110"]
-    d = ["00100","00101"]
-    e = ["01111","10000","10001","10010"]
-    f = ["10011"] 
-
-    for inst in memory_inst:
+    c = ["00011","00111","01101","01110"]
+    d = ["01000","01001"]
+    e = ["01111","11100","11101","11111"]
+    f = ["11010"] 
+    
+    while True:
+        to_exec = bintodec(pc) 
+        inst = memory_inst[to_exec]
+        
         if inst[0:5] in a:
             typeA(inst,regs)
+            pc = dectobin(bintodec(pc) + 1)
+            print(pc, end=" ")
+            register_dump(regs)
+            
 
-        '''if inst[0:5] in b:
-            typeB(inst,regs)
+        # if inst[0:5] in b:
+        #     typeB(inst,regs)
+        #     pc = dectobin(bintodec(pc) + 1)
+        #     print(pc, end=" ")
+        #     register_dump(regs)
+            
 
-        if inst[0:5] in c:
-            typeC(inst,regs)
+        # if inst[0:5] in c:
+        #     typeC(inst,regs)
+        #     pc = dectobin(bintodec(pc) + 1)
+        #     print(pc, end=" ")
+        #     register_dump(regs)
+            
 
-        if inst[0:5] in d:
-            typeD(inst,regs)
+        # if inst[0:5] in d:
+        #     typeD(inst,regs)
+        #     pc = dectobin(bintodec(pc) + 1)
+        #     print(pc, end=" ")
+        #     register_dump(regs)
+            
         
         if inst[0:5] in e:
-            typeE(inst,regs)
-
-        if inst[0:5] in f:
-            typeF(inst,regs)'''
+            pc = typeE(inst,regs,pc)
+            print(pc, end=" ")
+            register_dump(regs)
+            
+        
+        # if inst[0:5] in f:
+        #     typeF(inst,regs)
+        #     memory_dump(memory_inst)
+        #     break
