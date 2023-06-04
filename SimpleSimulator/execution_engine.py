@@ -48,6 +48,12 @@ def typeA(inst,register_dict):
         result=val1_bin ^ val2_bin
         result=bin(result)[2:]
         update_val(register_dict,inst[7:10],result)
+        
+def typeB(inst, register_dict):
+    if inst[0:5] == "00010":
+        register_dict[inst[6:9]] = inst[9:]
+    if inst[0:5] == "01000":
+        
 
 
 def typeE(inst, register_dict, pc):
@@ -77,7 +83,7 @@ def execute(memory_inst,regs):   # list of memory instructions
     a = ["00000","00001","00110","01010","01011","01100"]
     b = ["00010","01000","01001"]
     c = ["00011","00111","01101","01110"]
-    d = ["01000","01001"]
+    d = ["00100","00101"]
     e = ["01111","11100","11101","11111"]
     f = ["11010"] 
     
