@@ -38,13 +38,6 @@ def update_val(register_dict,register_no,value):
     register_dict[register_no]=value
 
 
-''' reseting the value of register to zero '''
-
-def reset_val(register_dict,register_no):
-
-    register_dict[register_no]='0000000000000000'
-
-
 ''' printing the values of all the registers '''
 
 def register_dump(register_dict):
@@ -71,6 +64,7 @@ def set_flag(register_dict,index):
     slice2=register_dict['111'][index+1:]
     flags=slice1+'1'+slice2
     register_dict['111']=flags 
+
 
 def check_overflow(dec,register_dict,register_no):
     if (dec>65535 or dec<0):
