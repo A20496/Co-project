@@ -1,5 +1,6 @@
 from register_file import *
 from memory_file import *
+from main import *
 
 pc = "0000000"                 #will store memory address
 
@@ -54,7 +55,11 @@ def typeB(inst, register_dict):
         register_dict[inst[6:9]] = inst[9:]
     if inst[0:5] == "01000":
         
-
+def typeD(inst, register_dict):
+    if inst[0:5] == "00101":            #store
+        memory_inst[bintodec(inst[9:])] = register_dict[inst[6:9]]
+    if inst[0:5] == "00100":            #load
+        register_dict[inst[6:9]] = memory_inst[bintodec(inst[9:])]
 
 def typeE(inst, register_dict, pc):
     if inst[0:5] == "01111":
