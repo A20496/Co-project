@@ -6,12 +6,13 @@ pc = "0000000"                 #will store memory address
 
 def typeA(inst,register_dict):
 
-    register_dict['111']='0000000000000000'
+    register_dict['111'] = '0000000000000000'
 
     ''' 
     fetching value of source registers and updating the value of destination register 
     after cheching overflow 
     ''' 
+    
     val1_bin = register_dict[inst[10:13]]
     val2_bin = register_dict[inst[10:13]]
     val1_dec = bintodec(val1_bin)
@@ -155,11 +156,11 @@ def execute(memory_inst,regs):   # list of memory instructions
             register_dump(regs)
             
 
-        # if inst[0:5] in b:
-        #     typeB(inst,regs)
-        #     pc = dectobin(bintodec(pc) + 1)
-        #     print(pc, end=" ")
-        #     register_dump(regs)
+        if inst[0:5] in b:
+            typeB(inst,regs)
+            pc = dectobin(bintodec(pc) + 1)
+            print(pc, end=" ")
+            register_dump(regs)
             
 
         # if inst[0:5] in c:
@@ -169,11 +170,11 @@ def execute(memory_inst,regs):   # list of memory instructions
         #     register_dump(regs)
             
 
-        # if inst[0:5] in d:
-        #     typeD(inst,regs)
-        #     pc = dectobin(bintodec(pc) + 1)
-        #     print(pc, end=" ")
-        #     register_dump(regs)
+        if inst[0:5] in d:
+            typeD(inst,regs)
+            pc = dectobin(bintodec(pc) + 1)
+            print(pc, end=" ")
+            register_dump(regs)
             
         
         if inst[0:5] in e:
@@ -182,7 +183,6 @@ def execute(memory_inst,regs):   # list of memory instructions
             register_dump(regs)
             
         
-        # if inst[0:5] in f:
-        #     typeF(inst,regs)
-        #     memory_dump(memory_inst)
-        #     break
+        if inst[0:5] == "11010":        # --------- halt --------
+            memory_dump(memory_inst)
+            break
