@@ -2,14 +2,14 @@
 
 def bintodec(ssnumber):    #input:string
     sum=0
-    for i in range(0,16):
+    for i in range(0,len(ssnumber)):
         if ssnumber[i]=="1":
-            sum+=2**(15-i)
+            sum+=2**(len(ssnumber)-1-i)
     return sum             #output: integer
 
-def dectobin(dec):        #input:integer
+def dectobin(dec, n):        #input:integer
     binary=format(dec,'b')
-    bin_num="0"*(16-len(binary))+binary
+    bin_num="0"*(n-len(binary))+binary
     return bin_num       #output:string
 
 #------------- INITIALISING REGISTER VALUES -----------#
@@ -73,7 +73,7 @@ def check_overflow(dec,register_dict,register_no):
             register_dict[register_no]='0000000000000000'
 
     else:
-        register_dict[register_no]=dectobin(dec)
+        register_dict[register_no]=dectobin(dec, 16)
 
 def check_lessThan(n1,n2,register_dict):
     if(n1<n2):

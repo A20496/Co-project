@@ -1,8 +1,6 @@
 from register_file import *
 from memory_file import *
-from main import *
 
-pc = "0000000"                 #will store memory address
 
 def typeA(inst,register_dict):
 
@@ -94,8 +92,8 @@ def typeC(line,reg_dict):
             reg_dict[reg1]="0000000000000000"
             set_flag(reg_dict,12)
         else:
-            r0=dectobin(int(decval_reg1/decval_reg2))  #quotient
-            r1=dectobin(int(decval_reg1%decval_reg2))  #remainder
+            r0=dectobin(int(decval_reg1/decval_reg2), 16)  #quotient
+            r1=dectobin(int(decval_reg1%decval_reg2), 16)  #remainder
             reg_dict["000"]=r0
             reg_dict["001"]=r1
     #invert/not
@@ -108,7 +106,7 @@ def typeC(line,reg_dict):
         check_greaterThan(decval_reg1,decval_reg2,reg_dict)
         check_equal(decval_reg1,decval_reg2,reg_dict)
         
-def typeD(inst, register_dict):
+def typeD(inst, register_dict, memory_inst):
     if inst[0:5] == "00101":            #store
         memory_inst[bintodec(inst[9:])] = register_dict[inst[6:9]]
     if inst[0:5] == "00100":            #load
@@ -116,25 +114,25 @@ def typeD(inst, register_dict):
 
 def typeE(inst, register_dict, pc):
     if inst[0:5] == "01111":
-        return inst[9:]
+        return inst[9:], pc
     if inst[0:5] == "11100":
         if regs[111][13] == "1":
-            return inst[9:]
+            return inst[9:], pc
         else:
-            return dectobin(bintodec(pc) + 1)
+            return dectobin(bintodec(pc) + 1, 7), pc
     if inst[0:5] == "11101":
         if regs[111][14] == "1":
-            return inst[9:]
+            return inst[9:], pc
         else:
-            return dectobin(bintodec(pc) + 1)
+            return dectobin(bintodec(pc) + 1, 7), pc
     if inst[0:5] == "11111":
         if regs[111][15] == "1":
-            return inst[9:]
+            return inst[9:], pc
         else:
-            return dectobin(bintodec(pc) + 1)
+            return dectobin(bintodec(pc) + 1, 7), pc
         
 
-def execute(memory_inst,regs):   # list of memory instructions
+def cute(memory_inst,regs, pc):   # list of memory instructions
     
     #making the lists of the op codes and defining the types of function
 
@@ -151,38 +149,39 @@ def execute(memory_inst,regs):   # list of memory instructions
         
         if inst[0:5] in a:
             typeA(inst,regs)
-            pc = dectobin(bintodec(pc) + 1)
             print(pc, end=" ")
+            pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
 
         if inst[0:5] in b:
             typeB(inst,regs)
-            pc = dectobin(bintodec(pc) + 1)
             print(pc, end=" ")
+            pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
 
-        # if inst[0:5] in c:
-        #     typeC(inst,regs)
-        #     pc = dectobin(bintodec(pc) + 1)
-        #     print(pc, end=" ")
-        #     register_dump(regs)
+        if inst[0:5] in c:
+            typeC(inst,regs)
+            print(pc, end=" ")
+            pc = dectobin(bintodec(pc) + 1, 7)
+            register_dump(regs)
             
 
         if inst[0:5] in d:
-            typeD(inst,regs)
-            pc = dectobin(bintodec(pc) + 1)
+            typeD(inst,regs, memory_inst)
             print(pc, end=" ")
+            pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
         
         if inst[0:5] in e:
-            pc = typeE(inst,regs,pc)
-            print(pc, end=" ")
+            pc, oldpc = typeE(inst,regs,pc)
+            print(oldpc, end=" ")
             register_dump(regs)
-            
         
         if inst[0:5] == "11010":        # --------- halt --------
+            print(pc, end=" ")
+            register_dump(regs)
             memory_dump(memory_inst)
             break
