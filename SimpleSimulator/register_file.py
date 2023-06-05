@@ -1,13 +1,13 @@
 #-------------------CONVERSIONS----------------------#
 
-def bintodec(bin_str):
-    # given binary number is a string 
-    return int(bin_str,2)
+# def bintodec(bin_str):
+#     # given binary number is a string 
+#     return int(bin_str,2)
 
-def dectobin(dec):
-    binary=format(dec,'b')
-    bin_num="0"*(16-len(binary))+binary
-    return bin_num 
+# def dectobin(dec):
+#     binary=format(dec,'b')
+#     bin_num="0"*(16-len(binary))+binary
+#     return bin_num 
 
 #------------- INITIALISING REGISTER VALUES -----------#
 
