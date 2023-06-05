@@ -1,13 +1,16 @@
 #-------------------CONVERSIONS----------------------#
 
-def bintodec(bin_str):
-    # given binary number is a string 
-    return int(bin_str,2)
+def bintodec(ssnumber):    #input:string
+    sum=0
+    for i in range(0,16):
+        if ssnumber[i]=="1":
+            sum+=2**(15-i)
+    return sum             #output: integer
 
-def dectobin(dec):
+def dectobin(dec):        #input:integer
     binary=format(dec,'b')
     bin_num="0"*(16-len(binary))+binary
-    return bin_num 
+    return bin_num       #output:string
 
 #------------- INITIALISING REGISTER VALUES -----------#
 
@@ -23,6 +26,16 @@ regs={
     }
 
 #--------------- REGISTER FUNCTIONS ------------------- #
+def invert(registervalue):
+    invList = list(registervalue) 
+    for i in range(0,16):
+        if invList[i]=='0':
+            invList[i]='1'
+        elif invList[i]=='1':
+            invList[i]='0'
+    val="".join(invList)
+    return val
+
 
 
 ''' printing the values of all the registers '''

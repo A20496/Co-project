@@ -6,7 +6,7 @@ pc = "0000000"                 #will store memory address
 
 def typeA(inst,register_dict):
 
-    update_val(register_dict,'111','0000000000000000')
+    register_dict['111']='0000000000000000'
 
     ''' 
     fetching value of source registers and updating the value of destination register 
@@ -73,6 +73,39 @@ def typeB(inst, register_dict):
         left_shifted = left_shifted[shift_value:]
 
         register_dict[inst[6:9]] = left_shifted 
+
+# TYPE C
+def typeC(line,reg_dict):
+    opcode=line[0:5]
+    reg1=line[10:13]
+    reg2=line[13:16]
+    binval_reg1=reg_dict[reg1]
+    binval_reg2=reg_dict[reg2]
+    decval_reg1=bintodec(str(binval_reg1))
+    decval_reg2=bintodec(str(binval_reg2))
+    reg_dict["111"]="0000000000000000"
+    #mov
+    if opcode=="00011":
+        reg_dict[reg1]=binval_reg2
+    #div
+    elif opcode=="00111":
+        if binval_reg2=="0000000000000000":
+            reg_dict[reg1]="0000000000000000"
+            set_flag(reg_dict,12)
+        else:
+            r0=dectobin(int(decval_reg1/decval_reg2))  #quotient
+            r1=dectobin(int(decval_reg1%decval_reg2))  #remainder
+            reg_dict["000"]=r0
+            reg_dict["001"]=r1
+    #invert/not
+    elif opcode=="01101":
+        inv_val=invert(binval_reg2)
+        reg_dict[reg1]=inv_val
+    #compare
+    elif opcode=="01110":
+        check_lessThan(decval_reg1,decval_reg2,reg_dict)
+        check_greaterThan(decval_reg1,decval_reg2,reg_dict)
+        check_equal(decval_reg1,decval_reg2,reg_dict)
         
 def typeD(inst, register_dict):
     if inst[0:5] == "00101":            #store
