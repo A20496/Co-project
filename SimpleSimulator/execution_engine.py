@@ -53,7 +53,7 @@ def typeA(inst,register_dict):
 def typeB(inst, register_dict):
     # mov immediate
     if inst[0:5] == "00010":
-        register_dict[inst[6:9]] = inst[9:]
+        register_dict[inst[6:9]] = "0"*9 + inst[9:]
 
     #right shift
     if inst[0:5] == "01000": 
@@ -114,22 +114,22 @@ def typeD(inst, register_dict, memory_inst):
 
 def typeE(inst, register_dict, pc):
     if inst[0:5] == "01111":
-        return inst[9:], pc
+        return inst[9:], pc, True
     if inst[0:5] == "11100":
-        if regs[111][13] == "1":
-            return inst[9:], pc
+        if regs['111'][13] == "1":
+            return inst[9:], pc, True
         else:
-            return dectobin(bintodec(pc) + 1, 7), pc
+            return dectobin(bintodec(pc) + 1, 7), pc, False
     if inst[0:5] == "11101":
-        if regs[111][14] == "1":
-            return inst[9:], pc
+        if regs['111'][14] == "1":
+            return inst[9:], pc, True
         else:
-            return dectobin(bintodec(pc) + 1, 7), pc
+            return dectobin(bintodec(pc) + 1, 7), pc, False
     if inst[0:5] == "11111":
-        if regs[111][15] == "1":
-            return inst[9:], pc
+        if regs['111'][15] == "1":
+            return inst[9:], pc, True
         else:
-            return dectobin(bintodec(pc) + 1, 7), pc
+            return dectobin(bintodec(pc) + 1, 7), pc, False
         
 
 def cute(memory_inst,regs, pc):   # list of memory instructions
@@ -144,44 +144,49 @@ def cute(memory_inst,regs, pc):   # list of memory instructions
     f = ["11010"] 
     
     while True:
-        to_exec = bintodec(pc) 
+        to_exec = bintodec(pc)
         inst = memory_inst[to_exec]
         
         if inst[0:5] in a:
             typeA(inst,regs)
-            print(pc, end=" ")
+            print(pc, end="        ")
             pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
 
         if inst[0:5] in b:
             typeB(inst,regs)
-            print(pc, end=" ")
+            print(pc, end="        ")
             pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
 
         if inst[0:5] in c:
             typeC(inst,regs)
-            print(pc, end=" ")
+            print(pc, end="        ")
             pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
 
         if inst[0:5] in d:
             typeD(inst,regs, memory_inst)
-            print(pc, end=" ")
+            print(pc, end="        ")
             pc = dectobin(bintodec(pc) + 1, 7)
             register_dump(regs)
             
         
         if inst[0:5] in e:
-            pc, oldpc = typeE(inst,regs,pc)
-            print(oldpc, end=" ")
+            newpc, oldpc, jump_flag = typeE(inst,regs,pc)
+            print(pc, end="        ")
+            if jump_flag == True:
+                pc = newpc
+            else:
+                pc = dectobin(bintodec(oldpc) + 1, 7)
+            
             register_dump(regs)
         
         if inst[0:5] == "11010":        # --------- halt --------
-            print(pc, end=" ")
+            print(pc, end="        ")
             register_dump(regs)
             memory_dump(memory_inst)
             break
