@@ -12,9 +12,10 @@ def typeA(inst,register_dict):
     ''' 
     
     val1_bin = register_dict[inst[10:13]]
-    val2_bin = register_dict[inst[10:13]]
+    val2_bin = register_dict[inst[13:16]]
     val1_dec = bintodec(val1_bin)
     val2_dec = bintodec(val2_bin)
+    #print(val1_bin , val2_bin , val1_dec , val2_dec )
 
     #ADD 
     if inst[0:5]=='00000':
@@ -51,6 +52,9 @@ def typeA(inst,register_dict):
         
         
 def typeB(inst, register_dict):
+
+    register_dict['111'] = '0000000000000000'
+
     # mov immediate
     if inst[0:5] == "00010":
         register_dict[inst[6:9]] = "0"*9 + inst[9:]
@@ -82,7 +86,9 @@ def typeC(line,reg_dict):
     binval_reg2=reg_dict[reg2]
     decval_reg1=bintodec(str(binval_reg1))
     decval_reg2=bintodec(str(binval_reg2))
+
     reg_dict["111"]="0000000000000000"
+
     #mov
     if opcode=="00011":
         reg_dict[reg1]=binval_reg2
@@ -107,28 +113,42 @@ def typeC(line,reg_dict):
         check_equal(decval_reg1,decval_reg2,reg_dict)
         
 def typeD(inst, register_dict, memory_inst):
+
+    register_dict['111'] = '0000000000000000'
+
     if inst[0:5] == "00101":            #store
         memory_inst[bintodec(inst[9:])] = register_dict[inst[6:9]]
     if inst[0:5] == "00100":            #load
         register_dict[inst[6:9]] = memory_inst[bintodec(inst[9:])]
 
 def typeE(inst, register_dict, pc):
+        
     if inst[0:5] == "01111":
+        register_dict['111'] = '0000000000000000'
         return inst[9:], pc, True
+    
     if inst[0:5] == "11100":
         if regs['111'][13] == "1":
+            register_dict['111'] = '0000000000000000'
             return inst[9:], pc, True
         else:
+            register_dict['111'] = '0000000000000000'
             return dectobin(bintodec(pc) + 1, 7), pc, False
+        
     if inst[0:5] == "11101":
         if regs['111'][14] == "1":
+            register_dict['111'] = '0000000000000000'
             return inst[9:], pc, True
         else:
+            register_dict['111'] = '0000000000000000'
             return dectobin(bintodec(pc) + 1, 7), pc, False
+        
     if inst[0:5] == "11111":
         if regs['111'][15] == "1":
+            register_dict['111'] = '0000000000000000'
             return inst[9:], pc, True
         else:
+            register_dict['111'] = '0000000000000000'
             return dectobin(bintodec(pc) + 1, 7), pc, False
         
 

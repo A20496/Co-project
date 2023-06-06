@@ -26,6 +26,7 @@ regs={
     }
 
 #--------------- REGISTER FUNCTIONS ------------------- #
+
 def invert(registervalue):
     invList = list(registervalue) 
     for i in range(0,16):
