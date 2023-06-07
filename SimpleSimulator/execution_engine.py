@@ -34,20 +34,20 @@ def typeA(inst,register_dict):
     
     #OR 
     elif inst[0:5]=='01011':
-        result=val1_bin | val2_bin
-        result=bin(result)[2:]
+        result=val1_dec | val2_dec
+        result=dectobin(result, 16)
         register_dict[inst[7:10]] = result
     
     #AND
     elif inst[0:5]=='01100':
-        result=val1_bin & val2_bin
-        result=bin(result)[2:]
+        result=val1_dec & val2_dec
+        result=dectobin(result, 16)
         register_dict[inst[7:10]] = result
         
     #XOR
     elif inst[0:5]=='01010':
-        result=val1_bin ^ val2_bin
-        result=bin(result)[2:]
+        result=val1_dec ^ val2_dec
+        result=dectobin(result, 16)
         register_dict[inst[7:10]] = result
         
         
@@ -64,7 +64,7 @@ def typeB(inst, register_dict):
         shift_value = bintodec(inst[9:])
         register_val = bintodec(register_dict[inst[6:9]])
         right_shifted = register_val >> shift_value
-        right_shifted = "0"*shift_value + right_shifted
+        right_shifted = "0"*shift_value + str(right_shifted)
 
         register_dict[inst[6:9]] = right_shifted
 
@@ -162,10 +162,9 @@ def cute(memory_inst,regs, pc):   # list of memory instructions
     d = ["00100","00101"]
     e = ["01111","11100","11101","11111"]
     f = ["11010"] 
-    
+
     while True:
-        to_exec = bintodec(pc)
-        inst = memory_inst[to_exec]
+        inst = memory_inst[bintodec(pc)]
         
         if inst[0:5] in a:
             typeA(inst,regs)
@@ -206,7 +205,11 @@ def cute(memory_inst,regs, pc):   # list of memory instructions
             register_dump(regs)
         
         if inst[0:5] == "11010":        # --------- halt --------
+            regs['111'] = '0000000000000000'
+
             print(pc, end="        ")
             register_dump(regs)
+            for i in range(128-len(memory_inst)):  
+                memory_inst.append('0000000000000000')
             memory_dump(memory_inst)
             break
