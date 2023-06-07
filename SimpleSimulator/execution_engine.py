@@ -61,16 +61,17 @@ def typeB(inst, register_dict):
 
     #right shift
     if inst[0:5] == "01000": 
-        shift_value = bintodec(inst[9:])
+        shift_value = int(bintodec(inst[9:]))
         register_val = bintodec(register_dict[inst[6:9]])
         right_shifted = register_val >> shift_value
-        right_shifted = "0"*shift_value + str(right_shifted)
+        #right_shifted = "0"*shift_value + str(dectobin(right_shifted,16))
+        right_shifted=str(dectobin(right_shifted,16))
 
         register_dict[inst[6:9]] = right_shifted
 
     #left shift
     if inst[0:5] == "01001":
-        shift_value = bintodec(inst[9:])
+        shift_value = int(bintodec(inst[9:]))
         register_val = bintodec(register_dict[inst[6:9]])
         left_shifted = register_val << shift_value
         left_shifted = left_shifted[shift_value:]
